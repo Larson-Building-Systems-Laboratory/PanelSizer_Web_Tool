@@ -15,7 +15,3 @@ cd frontend
 npm install
 npm run dev             # runs on http://localhost:5173
 ```
-
-Open **http://localhost:5173**.
-
----
