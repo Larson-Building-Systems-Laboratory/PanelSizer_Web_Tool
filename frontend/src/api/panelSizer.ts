@@ -32,7 +32,12 @@ export async function calculatePanel(data: CalculatePayload): Promise<CalculateR
     body: JSON.stringify(data),
   });
 
-  const json = await res.json();
+  let json: any;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Error(`Server error (${res.status}): backend may not be running.`);
+  }
 
   if (!res.ok || !json.success) {
     throw new Error(json.error || 'Calculation failed.');

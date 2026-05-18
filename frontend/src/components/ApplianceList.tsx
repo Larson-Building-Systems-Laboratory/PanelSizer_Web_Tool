@@ -17,7 +17,7 @@ const SUGGESTIONS = [
 ];
 
 const inputCls =
-  'bg-bg border border-border rounded-md text-text text-sm px-2.5 py-2 w-full outline-none focus:border-blue transition-colors';
+  'bg-white border border-border rounded text-text text-sm px-2.5 py-2 w-full outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors';
 
 interface RowProps {
   appliance: Appliance;
@@ -27,7 +27,7 @@ interface RowProps {
 
 function ApplianceRow({ appliance, onChange, onRemove }: RowProps) {
   return (
-    <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 items-center py-1.5">
+    <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 items-center py-2 border-b border-border last:border-b-0">
       <input
         className={inputCls}
         type="text"
@@ -65,7 +65,7 @@ function ApplianceRow({ appliance, onChange, onRemove }: RowProps) {
         type="button"
         aria-label="Remove appliance"
         onClick={() => onRemove(appliance.id)}
-        className="w-[30px] h-[30px] flex items-center justify-center rounded-md border border-remove-border text-remove-fg text-sm cursor-pointer hover:bg-remove-border hover:text-red transition-colors"
+        className="w-[30px] h-[30px] flex items-center justify-center rounded border border-remove-border text-remove-fg text-sm cursor-pointer hover:bg-error-bg hover:text-red transition-colors"
       >
         ✕
       </button>
@@ -82,33 +82,39 @@ interface Props {
 
 export default function ApplianceList({ appliances, onAdd, onChange, onRemove }: Props) {
   return (
-    <section className="bg-bg-card border border-border rounded-xl p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">Appliances</h2>
+    <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-bg-card-hover">
+        <div className="flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+          <h2 className="text-sm font-semibold text-text">Appliances</h2>
+        </div>
         <button
           type="button"
           onClick={onAdd}
-          className="border border-dashed border-border text-muted text-xs px-3 py-1.5 rounded-md hover:border-blue hover:text-blue transition-colors cursor-pointer"
+          className="bg-white border border-border text-muted text-xs px-3 py-1.5 rounded hover:border-blue hover:text-blue transition-colors cursor-pointer"
         >
           + Add Appliance
         </button>
       </div>
 
-      {appliances.length === 0 && (
-        <p className="text-xs text-muted text-center py-4">
-          No appliances added yet. Click &quot;+ Add Appliance&quot; to begin.
-        </p>
-      )}
+      <div className="p-5">
+        {appliances.length === 0 && (
+          <p className="text-xs text-muted text-center py-4">
+            No appliances added yet. Click &quot;+ Add Appliance&quot; to begin.
+          </p>
+        )}
 
-      {appliances.length > 0 && (
-        <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 pb-1.5 mb-1 border-b border-border text-[11px] uppercase tracking-wider text-muted">
-          <span>Name</span><span>Power</span><span>Voltage</span><span />
-        </div>
-      )}
-
-      {appliances.map(a => (
-        <ApplianceRow key={a.id} appliance={a} onChange={onChange} onRemove={onRemove} />
-      ))}
+        {appliances.length > 0 && (
+          <>
+            <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 pb-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted">
+              <span>Name</span><span>Power</span><span>Voltage</span><span />
+            </div>
+            {appliances.map(a => (
+              <ApplianceRow key={a.id} appliance={a} onChange={onChange} onRemove={onRemove} />
+            ))}
+          </>
+        )}
+      </div>
     </section>
   );
 }
