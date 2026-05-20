@@ -1,4 +1,4 @@
-﻿Number of Ranges,Column A: Demand Factors (%) (Less than 3.4 kW),Column B: Demand Factors (%) (3.5-8.75 kW),Column C: Maximum Demand (kW) (8.75 - 12 kW)
+﻿Number of Ranges,Column A: Demand Factors (%) (Less than 3.4 kW),Column B: Demand Factors (%) (3.5 kW to 8.75 kW),Column C: Maximum Demand (kW) (8.75 - 12 kW)
 1,80,80,8
 2,75,65,11
 3,70,55,14

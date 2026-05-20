@@ -47,7 +47,6 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
         />
         <ResultCard
           title="Neutral Conductor"
-          rating={neutral.service_rating}
           conductorSize={neutral.conductor_size}
           borderClass="border-l-green"
           bgClass="bg-green-light"
