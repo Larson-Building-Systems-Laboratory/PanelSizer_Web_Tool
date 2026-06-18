@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import DwellingForm, { type DwellingValues } from '@/components/DwellingForm';
 import ApplianceList, { newAppliance, type Appliance } from '@/components/ApplianceList';
-import CalculationLog from '@/components/CalculationLog';
 import ResultsPanel from '@/components/ResultsPanel';
 import { calculatePanel, type CalculateResult } from '@/api/panelSizer';
 
@@ -167,12 +166,7 @@ export default function Page() {
               <p className="text-sm text-muted">Running NEC calculations…</p>
             </div>
           )}
-          {results && (
-            <>
-              <ResultsPanel results={results} />
-              <CalculationLog log={results.log} />
-            </>
-          )}
+          {results && <ResultsPanel results={results} />}
         </div>
       </main>
     </div>
