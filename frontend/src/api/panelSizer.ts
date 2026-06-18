@@ -4,11 +4,14 @@ export interface ApplianceInput {
   voltage: 120 | 240;
 }
 
+export type CalculationMethod = 'Standard' | 'Optional';
+
 export interface CalculatePayload {
   square_feet: number;
   kitchen_circuits: number;
   laundry_circuits: number;
   material: 'copper' | 'aluminum';
+  method: CalculationMethod;
   appliances: ApplianceInput[];
 }
 
@@ -20,6 +23,7 @@ export interface ConductorResult {
 export interface CalculateResult {
   success: boolean;
   log: string[];
+  method: CalculationMethod;
   service: ConductorResult;
   neutral: ConductorResult;
   grounding_conductor_size: string;

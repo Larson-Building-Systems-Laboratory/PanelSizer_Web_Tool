@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 backend/venv/
+api/venv/
 
 # Next.js
 frontend/.next/

@@ -27,12 +27,15 @@ function ResultCard({ title, rating, conductorSize, borderClass, bgClass }: Card
 }
 
 export default function ResultsPanel({ results }: { results: CalculateResult }) {
-  const { service, neutral, grounding_conductor_size } = results;
+  const { service, neutral, grounding_conductor_size, method } = results;
 
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden [animation:fadeIn_0.3s_ease]">
       <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-bg-card-hover">
         <h2 className="text-sm font-semibold text-text">Results Summary</h2>
+        <span className="text-xs bg-blue-light text-blue px-2.5 py-0.5 rounded-full font-semibold">
+          {method} Method
+        </span>
         <span className="ml-auto text-xs bg-green-light text-green px-2.5 py-0.5 rounded-full font-semibold">
           Calculated
         </span>

@@ -12,6 +12,7 @@ const DEFAULTS: DwellingValues = {
   kitchenCircuits: 2,
   laundryCircuits: 1,
   material: 'copper',
+  method: 'Standard',
 };
 
 const STEPS = [
@@ -58,6 +59,7 @@ export default function Page() {
         kitchen_circuits: Number(dwelling.kitchenCircuits),
         laundry_circuits: Number(dwelling.laundryCircuits),
         material: dwelling.material,
+        method: dwelling.method,
         appliances: appliances.map(a => ({
           name: a.name,
           power_watts: Number(a.powerWatts),

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Starting Flask backend on http://localhost:8000 ..."
-cd "$ROOT/backend"
+echo "Starting Flask API on http://localhost:8000 ..."
+cd "$ROOT/api"
 source venv/bin/activate
 python3 app.py &
 FLASK_PID=$!

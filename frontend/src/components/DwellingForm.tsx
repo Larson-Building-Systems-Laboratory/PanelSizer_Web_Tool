@@ -3,6 +3,7 @@ export interface DwellingValues {
   kitchenCircuits: number;
   laundryCircuits: number;
   material: 'copper' | 'aluminum';
+  method: 'Standard' | 'Optional';
 }
 
 interface Props {
@@ -60,7 +61,7 @@ export default function DwellingForm({ values, onChange }: Props) {
           </div>
         </div>
 
-        <div>
+        <div className="mb-4">
           <label className={labelCls}>Conductor Material</label>
           <div className="flex gap-6 mt-1.5">
             {(['copper', 'aluminum'] as const).map(m => (
@@ -77,6 +78,30 @@ export default function DwellingForm({ values, onChange }: Props) {
               </label>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className={labelCls}>Calculation Method</label>
+          <div className="flex gap-6 mt-1.5">
+            {(['Standard', 'Optional'] as const).map(m => (
+              <label key={m} className="flex items-center gap-2 text-sm text-text cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="method"
+                  value={m}
+                  checked={values.method === m}
+                  onChange={() => onChange('method', m)}
+                  className="accent-blue"
+                />
+                {m}
+              </label>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted mt-1.5">
+            {values.method === 'Standard'
+              ? 'NEC Art. 220 — sizes phases and neutral separately for every load category.'
+              : 'NEC 220.82 — sizes phase conductors only (neutral still uses the Standard method).'}
+          </p>
         </div>
       </div>
     </section>
