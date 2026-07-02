@@ -1,4 +1,6 @@
 import type { CalculateResult } from '@/api/panelSizer';
+import PanelDiagram from './PanelDiagram';
+import CalculationLog from './CalculationLog';
 
 interface CardProps {
   title: string;
@@ -27,7 +29,7 @@ function ResultCard({ title, rating, conductorSize, borderClass, bgClass }: Card
 }
 
 export default function ResultsPanel({ results }: { results: CalculateResult }) {
-  const { service, neutral, grounding_conductor_size, method } = results;
+  const { service, neutral, grounding_conductor_size, method, phase, material, log } = results;
 
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden [animation:fadeIn_0.3s_ease]">
@@ -61,6 +63,22 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
           bgClass="bg-orange-light"
         />
       </div>
+      <div className="px-5 pb-5">
+        <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted mb-3">
+          {phase === 3 ? 'Three-Phase (120/208 V)' : 'Single-Phase (120/240 V)'} Wiring Schematic
+        </h3>
+        <div className="border border-border rounded-lg p-4 bg-white">
+          <PanelDiagram
+            phase={phase}
+            breakerAmps={service.service_rating}
+            conductorSize={service.conductor_size}
+            neutralSize={neutral.conductor_size}
+            groundSize={grounding_conductor_size}
+            material={material}
+          />
+        </div>
+      </div>
+      <CalculationLog log={log} />
     </section>
   );
 }

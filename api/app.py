@@ -38,6 +38,11 @@ def validate(data):
     if method not in ("Standard", "Optional"):
         errors.append("method must be 'Standard' or 'Optional'.")
 
+    phase = data.get("phase", 1)
+    if phase not in (1, 3):
+        errors.append("phase must be 1 (single-phase) or 3 (three-phase).")
+    allowed_voltages = (120, 240) if phase == 1 else (120, 208)
+
     apps = data.get("appliances", [])
     if not isinstance(apps, list):
         errors.append("appliances must be a list.")
@@ -48,8 +53,11 @@ def validate(data):
             power = a.get("power_watts")
             if power is None or not isinstance(power, (int, float)) or power <= 0:
                 errors.append(f"Appliance {i + 1}: power_watts must be a positive number.")
-            if a.get("voltage", 240) not in (120, 240):
-                errors.append(f"Appliance {i + 1}: voltage must be 120 or 240.")
+            if a.get("voltage", allowed_voltages[-1]) not in allowed_voltages:
+                errors.append(
+                    f"Appliance {i + 1}: voltage must be one of {allowed_voltages} for "
+                    f"{'single' if phase == 1 else 'three'}-phase service."
+                )
 
     return errors
 
@@ -69,9 +77,11 @@ def calculate():
     laundry = data.get("laundry_circuits", 1)
     material = data.get("material", "copper").lower()
     method = data.get("method", "Standard")
+    phase = data.get("phase", 1)
+    service_voltage = 240 if phase == 1 else 208
 
     apps = [
-        Appliance(a["name"].strip(), a["power_watts"], a.get("voltage", 240))
+        Appliance(a["name"].strip(), a["power_watts"], a.get("voltage", service_voltage))
         for a in data.get("appliances", [])
     ]
 
@@ -83,6 +93,8 @@ def calculate():
                 appliances=apps,
                 kitchen_circuits=kitchen,
                 laundry_circuits=laundry,
+                voltage=service_voltage,
+                nphase=phase,
             )
             service, neutral = dwelling.get_service_entrance_size(material=material, method=method)
             grounding = dwelling.get_grounding_conductor_size(
@@ -99,6 +111,8 @@ def calculate():
         "success": True,
         "log": log,
         "method": method,
+        "material": material,
+        "phase": phase,
         "service": service,
         "neutral": neutral,
         "grounding_conductor_size": grounding,

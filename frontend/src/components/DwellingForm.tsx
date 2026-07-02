@@ -4,6 +4,7 @@ export interface DwellingValues {
   laundryCircuits: number;
   material: 'copper' | 'aluminum';
   method: 'Standard' | 'Optional';
+  phase: 1 | 3;
 }
 
 interface Props {
@@ -58,6 +59,28 @@ export default function DwellingForm({ values, onChange }: Props) {
               value={values.laundryCircuits}
               onChange={e => onChange('laundryCircuits', e.target.value)}
             />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className={labelCls}>Service Type</label>
+          <div className="flex gap-6 mt-1.5">
+            {([
+              { value: 1 as const, label: 'Single-Phase (120/240 V)' },
+              { value: 3 as const, label: 'Three-Phase (120/208 V)' },
+            ]).map(opt => (
+              <label key={opt.value} className="flex items-center gap-2 text-sm text-text cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="phase"
+                  value={opt.value}
+                  checked={values.phase === opt.value}
+                  onChange={() => onChange('phase', opt.value)}
+                  className="accent-blue"
+                />
+                {opt.label}
+              </label>
+            ))}
           </div>
         </div>
 

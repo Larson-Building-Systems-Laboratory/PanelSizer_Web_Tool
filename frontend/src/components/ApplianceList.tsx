@@ -4,11 +4,11 @@ export interface Appliance {
   id: string;
   name: string;
   powerWatts: string;
-  voltage: 120 | 240;
+  voltage: 120 | 208 | 240;
 }
 
-export function newAppliance(): Appliance {
-  return { id: uuidv4(), name: '', powerWatts: '', voltage: 240 };
+export function newAppliance(phase: 1 | 3 = 1): Appliance {
+  return { id: uuidv4(), name: '', powerWatts: '', voltage: phase === 3 ? 208 : 240 };
 }
 
 const SUGGESTIONS = [
@@ -22,11 +22,14 @@ const inputCls =
 
 interface RowProps {
   appliance: Appliance;
+  phase: 1 | 3;
   onChange: (id: string, field: keyof Appliance, value: string | number) => void;
   onRemove: (id: string) => void;
 }
 
-function ApplianceRow({ appliance, onChange, onRemove }: RowProps) {
+function ApplianceRow({ appliance, phase, onChange, onRemove }: RowProps) {
+  const secondaryVoltage = phase === 3 ? 208 : 240;
+
   return (
     <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 items-center py-2 border-b border-border last:border-b-0">
       <input
@@ -56,10 +59,10 @@ function ApplianceRow({ appliance, onChange, onRemove }: RowProps) {
       <select
         className={inputCls}
         value={appliance.voltage}
-        onChange={e => onChange(appliance.id, 'voltage', Number(e.target.value) as 120 | 240)}
+        onChange={e => onChange(appliance.id, 'voltage', Number(e.target.value) as 120 | 208 | 240)}
       >
         <option value={120}>120 V</option>
-        <option value={240}>240 V</option>
+        <option value={secondaryVoltage}>{secondaryVoltage} V</option>
       </select>
 
       <button
@@ -76,12 +79,13 @@ function ApplianceRow({ appliance, onChange, onRemove }: RowProps) {
 
 interface Props {
   appliances: Appliance[];
+  phase: 1 | 3;
   onAdd: () => void;
   onChange: (id: string, field: keyof Appliance, value: string | number) => void;
   onRemove: (id: string) => void;
 }
 
-export default function ApplianceList({ appliances, onAdd, onChange, onRemove }: Props) {
+export default function ApplianceList({ appliances, phase, onAdd, onChange, onRemove }: Props) {
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-bg-card-hover">
@@ -111,7 +115,7 @@ export default function ApplianceList({ appliances, onAdd, onChange, onRemove }:
               <span>Name</span><span>Power</span><span>Voltage</span><span />
             </div>
             {appliances.map(a => (
-              <ApplianceRow key={a.id} appliance={a} onChange={onChange} onRemove={onRemove} />
+              <ApplianceRow key={a.id} appliance={a} phase={phase} onChange={onChange} onRemove={onRemove} />
             ))}
           </>
         )}

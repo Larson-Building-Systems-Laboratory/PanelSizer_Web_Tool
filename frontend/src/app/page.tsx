@@ -12,6 +12,7 @@ const DEFAULTS: DwellingValues = {
   laundryCircuits: 1,
   material: 'copper',
   method: 'Standard',
+  phase: 1,
 };
 
 const STEPS = [
@@ -32,10 +33,15 @@ export default function Page() {
 
   function updateDwelling(field: keyof DwellingValues, value: string | number) {
     setDwelling(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'phase') {
+      const secondaryVoltage = value === 3 ? 208 : 240;
+      setAppliances(prev => prev.map(a => a.voltage === 120 ? a : { ...a, voltage: secondaryVoltage }));
+    }
   }
 
   function addAppliance() {
-    setAppliances(prev => [...prev, newAppliance()]);
+    setAppliances(prev => [...prev, newAppliance(dwelling.phase)]);
   }
 
   function updateAppliance(id: string, field: keyof Appliance, value: string | number) {
@@ -59,6 +65,7 @@ export default function Page() {
         laundry_circuits: Number(dwelling.laundryCircuits),
         material: dwelling.material,
         method: dwelling.method,
+        phase: dwelling.phase,
         appliances: appliances.map(a => ({
           name: a.name,
           power_watts: Number(a.powerWatts),
@@ -128,6 +135,7 @@ export default function Page() {
           <DwellingForm values={dwelling} onChange={updateDwelling} />
           <ApplianceList
             appliances={appliances}
+            phase={dwelling.phase}
             onAdd={addAppliance}
             onChange={updateAppliance}
             onRemove={removeAppliance}

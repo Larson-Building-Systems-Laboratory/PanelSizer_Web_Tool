@@ -1,10 +1,11 @@
 export interface ApplianceInput {
   name: string;
   power_watts: number;
-  voltage: 120 | 240;
+  voltage: 120 | 208 | 240;
 }
 
 export type CalculationMethod = 'Standard' | 'Optional';
+export type Phase = 1 | 3;
 
 export interface CalculatePayload {
   square_feet: number;
@@ -12,6 +13,7 @@ export interface CalculatePayload {
   laundry_circuits: number;
   material: 'copper' | 'aluminum';
   method: CalculationMethod;
+  phase: Phase;
   appliances: ApplianceInput[];
 }
 
@@ -24,6 +26,8 @@ export interface CalculateResult {
   success: boolean;
   log: string[];
   method: CalculationMethod;
+  material: 'copper' | 'aluminum';
+  phase: Phase;
   service: ConductorResult;
   neutral: ConductorResult;
   grounding_conductor_size: string;
