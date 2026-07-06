@@ -13,8 +13,8 @@ export function newAppliance(phase: 1 | 3 = 1): Appliance {
 
 const SUGGESTIONS = [
   'Disposal', 'Compactor', 'Blower Motor', 'Dishwasher', 'Water Heater',
-  'Clothes Dryer', 'Electric Range', 'HVAC', 'HVAC Cooling', 'HVAC Heat Pump',
-  'HVAC Electric Heating',
+  'Clothes Dryer', 'Electric Range', 'Heat Pump', 'Air Conditioner',
+  'Electric Heating System',
 ];
 
 const inputCls =

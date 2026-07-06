@@ -8,9 +8,10 @@ Use case
 Self-contained, importable module for programmatic service entrance sizing.
 All lookup tables are class-level constants (no CSV dependency for conductor
 or grounding data).  Supports both the Standard and Optional NEC sizing
-methods.  Appliances use a generic "HVAC" naming convention, making this
-suitable for data-driven workflows where appliance lists are generated
-programmatically (e.g., from a building energy model).
+methods.  HVAC-type appliances are recognized by keywords in their names
+("Heat Pump", "Air Conditioner", "Electric Heating System", or generic
+"HVAC"), making this suitable for data-driven workflows where appliance
+lists are generated programmatically (e.g., from a building energy model).
 
 Demand factor tables for dryers and ranges are still loaded from CSV files
 so they can be updated without code changes.
@@ -79,14 +80,17 @@ class Dwelling:
     Special (handled individually):
         "Clothes Dryer"          -> dryer demand factors (Table 7.1)
         "Electric Range"         -> range demand factors (Table 7.2)
-        "HVAC"                   -> HVAC standard/optional demand factors
+        "Heat Pump", "Air Conditioner", "Electric Heating System",
+        or any name containing "HVAC"
+                                 -> HVAC standard/optional demand factors
     Motor-type (included in fixed load + 25 % demand adder):
         "Compactor", "Disposal", "Motor"
     All others                   -> fixed appliance load (NEC 220.53)
     """
 
     # Appliance classification keyword sets
-    _HVAC_KEYWORDS  = ("HVAC",)
+    # "Air Condition" matches both "Air Conditioner" and "Air Conditioning"
+    _HVAC_KEYWORDS  = ("HVAC", "Heat Pump", "Air Condition", "Electric Heating", "Cooling")
     _MOTOR_KEYWORDS = ("Compactor", "Disposal", "Motor")
     _SPECIAL_NAMES  = ("Clothes Dryer", "Electric Range")
 
@@ -390,14 +394,14 @@ class Dwelling:
 
         Demand factors by system type:
         ----------------------------------------------------------------
-        "HVAC Cooling" / "HVAC Air Conditioning"   -> 100 %
-        "HVAC Heat Pump"                            -> 100 %
-        "HVAC Electric Heating" (< 4 units)         -> 65 %
-        "HVAC Electric Heating" (>= 4 units)        -> 40 %
+        "Air Conditioner" / "Cooling"               -> 100 %
+        "Heat Pump"                                 -> 100 %
+        "Electric Heating System" (< 4 units)       -> 65 %
+        "Electric Heating System" (>= 4 units)      -> 40 %
         Generic "HVAC" (type unspecified)           -> 100 %
         ----------------------------------------------------------------
-        Sub-type is detected by checking for keywords after "HVAC" in
-        the appliance name (e.g. "HVAC Electric Heating 1").
+        Sub-type is detected by checking for keywords in the appliance
+        name (e.g. "Electric Heating System 1").
 
         The method returns the *largest* of all computed demand loads,
         consistent with NEC taking the worst-case non-coincident load.
@@ -409,7 +413,7 @@ class Dwelling:
         electric_heating = [u for u in units if "Electric Heating" in u.name]
         cooling          = [u for u in units if
                             "Cooling" in u.name
-                            or "Air Conditioning" in u.name
+                            or "Air Condition" in u.name
                             or "Heat Pump" in u.name]
         generic          = [u for u in units
                             if u not in electric_heating and u not in cooling]

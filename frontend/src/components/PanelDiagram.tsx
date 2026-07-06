@@ -23,6 +23,8 @@ const LABEL_BOX_CX = 640;
 const LABEL_BOX_W = 210;
 const LABEL_BOX_H = 46;
 const GROUND_STUB_X = 240;
+// Distance from a wire's y to the center of the label box sitting on top of it
+const LABEL_LINE_GAP = LABEL_BOX_H / 2 + 8;
 
 function DashedLabel({ cx, cy, text }: { cx: number; cy: number; text: string }) {
   return (
@@ -102,7 +104,7 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
               strokeWidth={3}
             />
             <line x1={BREAKER_X2} y1={y} x2={LINE_END_X} y2={y} stroke={colors.text} strokeWidth={3} />
-            <DashedLabel cx={LABEL_BOX_CX} cy={y - 55} text={conductorLabel} />
+            <DashedLabel cx={LABEL_BOX_CX} cy={y - LABEL_LINE_GAP} text={conductorLabel} />
           </g>
         );
       })}
@@ -110,7 +112,7 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
       <g>
         <text x={LINE_START_X - 35} y={neutralY} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">N</text>
         <line x1={LINE_START_X} y1={neutralY} x2={LINE_END_X} y2={neutralY} stroke={colors.text} strokeWidth={3} />
-        <DashedLabel cx={LABEL_BOX_CX} cy={neutralY - 55} text={neutralLabel} />
+        <DashedLabel cx={LABEL_BOX_CX} cy={neutralY - LABEL_LINE_GAP} text={neutralLabel} />
       </g>
 
       <g>
@@ -118,8 +120,8 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
         <line x1={GROUND_STUB_X - 16} y1={groundStubBottomY} x2={GROUND_STUB_X + 16} y2={groundStubBottomY} stroke={colors.text} strokeWidth={3} />
         <line x1={GROUND_STUB_X - 10} y1={groundStubBottomY + 7} x2={GROUND_STUB_X + 10} y2={groundStubBottomY + 7} stroke={colors.text} strokeWidth={3} />
         <line x1={GROUND_STUB_X - 4} y1={groundStubBottomY + 14} x2={GROUND_STUB_X + 4} y2={groundStubBottomY + 14} stroke={colors.text} strokeWidth={3} />
-        <text x={GROUND_STUB_X - 45} y={groundLabelY} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">G</text>
-        <DashedLabel cx={GROUND_STUB_X + 260} cy={groundLabelY} text={groundLabel} />
+        <text x={GROUND_STUB_X - 32} y={groundLabelY} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">G</text>
+        <DashedLabel cx={GROUND_STUB_X + 25 + LABEL_BOX_W / 2} cy={groundLabelY} text={groundLabel} />
       </g>
     </svg>
   );
