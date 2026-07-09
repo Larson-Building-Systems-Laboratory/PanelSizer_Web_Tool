@@ -31,7 +31,7 @@ function ApplianceRow({ appliance, phase, onChange, onRemove }: RowProps) {
   const secondaryVoltage = phase === 3 ? 208 : 240;
 
   return (
-    <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 items-center py-2 border-b border-border last:border-b-0">
+    <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 items-center py-2 border-b border-border last:border-b-0">
       <input
         className={inputCls}
         type="text"
@@ -111,7 +111,7 @@ export default function ApplianceList({ appliances, phase, onAdd, onChange, onRe
 
         {appliances.length > 0 && (
           <>
-            <div className="grid grid-cols-[1fr_110px_90px_36px] gap-2 pb-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted">
+            <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 pb-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted">
               <span>Name</span><span>Power</span><span>Voltage</span><span />
             </div>
             {appliances.map(a => (

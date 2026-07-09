@@ -130,7 +130,7 @@ export default function Page() {
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto w-full px-8 py-6 grid grid-cols-[420px_1fr] gap-6 items-start max-[900px]:grid-cols-1">
+      <main className="max-w-7xl mx-auto w-full px-8 py-6 grid grid-cols-[480px_1fr] gap-6 items-start max-[900px]:grid-cols-1">
         <form className="flex flex-col gap-4" onSubmit={calculate}>
           <DwellingForm values={dwelling} onChange={updateDwelling} />
           <ApplianceList
