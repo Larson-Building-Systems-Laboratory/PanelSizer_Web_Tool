@@ -9,6 +9,8 @@ api/venv/
 frontend/.next/
 frontend/node_modules/
 frontend/out/
+AZURE_DEPLOY.md
+docker-compose.yml
 
 # Env files
 .env
