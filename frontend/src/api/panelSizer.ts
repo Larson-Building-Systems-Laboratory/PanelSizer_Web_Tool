@@ -18,7 +18,7 @@ export interface CalculatePayload {
 }
 
 export interface ConductorResult {
-  service_rating?: number;
+  service_rating?: number | null;
   conductor_size: string;
 }
 

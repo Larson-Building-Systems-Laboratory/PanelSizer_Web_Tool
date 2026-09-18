@@ -77,9 +77,11 @@ class Dwelling:
 
     Appliance naming conventions expected by this class
     ---------------------------------------------------
-    Special (handled individually):
-        "Clothes Dryer"          -> dryer demand factors (Table 7.1)
-        "Electric Range"         -> range demand factors (Table 7.2)
+    Special (handled individually), matched case-insensitively anywhere in
+    the appliance name (e.g. "Dryer", "Clothes Dryer", "Range", "Electric
+    Range" all match):
+        "Dryer"                  -> dryer demand factors (Table 7.1)
+        "Range"                  -> range demand factors (Table 7.2)
         "Heat Pump", "Air Conditioner", "Electric Heating System",
         or any name containing "HVAC"
                                  -> HVAC standard/optional demand factors
@@ -88,11 +90,12 @@ class Dwelling:
     All others                   -> fixed appliance load (NEC 220.53)
     """
 
-    # Appliance classification keyword sets
+    # Appliance classification keyword sets (matched case-insensitively)
     # "Air Condition" matches both "Air Conditioner" and "Air Conditioning"
-    _HVAC_KEYWORDS  = ("HVAC", "Heat Pump", "Air Condition", "Electric Heating", "Cooling")
-    _MOTOR_KEYWORDS = ("Compactor", "Disposal", "Motor")
-    _SPECIAL_NAMES  = ("Clothes Dryer", "Electric Range")
+    _HVAC_KEYWORDS   = ("hvac", "heat pump", "air condition", "electric heating", "cooling")
+    _MOTOR_KEYWORDS  = ("compactor", "disposal", "motor")
+    _DRYER_KEYWORDS  = ("dryer",)
+    _RANGE_KEYWORDS  = ("range",)
 
     # -----------------------------------------------------------------------
     # Table 7.5 – Single-Phase Service Entrance Ratings and Conductor Sizes
@@ -143,6 +146,43 @@ class Dwelling:
         },
     }
 
+    # -----------------------------------------------------------------------
+    # NEC Table 310.16 – Ampacities of insulated conductors (75 °C column)
+    # -----------------------------------------------------------------------
+    # Used to size the neutral conductor from its OWN calculated demand load
+    # rather than the service rating: NEC 310.15(B)(7) / 220.61 allow the
+    # neutral to be smaller than the ungrounded (phase) conductors, down to
+    # (but never below) the grounding conductor size required for the
+    # service, per NEC 250.24(C)(1). The Table 7.5 / 310.15(B)(6) service
+    # sizing guide above is NOT used here because it only starts at 100 A,
+    # which would over-size a lightly loaded neutral.
+    # -----------------------------------------------------------------------
+    NEUTRAL_SIZING_ORDER = [
+        "14 AWG", "12 AWG", "10 AWG", "8 AWG", "6 AWG", "4 AWG", "3 AWG",
+        "2 AWG", "1 AWG", "1/0 AWG", "2/0 AWG", "3/0 AWG", "4/0 AWG",
+        "250 MCM", "300 MCM", "350 MCM", "400 MCM", "500 MCM", "600 MCM",
+        "700 MCM", "750 MCM", "800 MCM", "900 MCM", "1000 MCM",
+    ]
+
+    AMPACITY_75C = {
+        "copper": {
+            "14 AWG": 20,  "12 AWG": 25,  "10 AWG": 35,  "8 AWG": 50,
+            "6 AWG": 65,   "4 AWG": 85,   "3 AWG": 100,  "2 AWG": 115,
+            "1 AWG": 130,  "1/0 AWG": 150, "2/0 AWG": 175, "3/0 AWG": 200,
+            "4/0 AWG": 230, "250 MCM": 255, "300 MCM": 285, "350 MCM": 310,
+            "400 MCM": 335, "500 MCM": 380, "600 MCM": 420, "700 MCM": 460,
+            "750 MCM": 475, "800 MCM": 490, "900 MCM": 520, "1000 MCM": 545,
+        },
+        "aluminum": {
+            "12 AWG": 20,  "10 AWG": 25,  "8 AWG": 40,   "6 AWG": 50,
+            "4 AWG": 65,   "3 AWG": 75,   "2 AWG": 90,   "1 AWG": 100,
+            "1/0 AWG": 120, "2/0 AWG": 135, "3/0 AWG": 155, "4/0 AWG": 180,
+            "250 MCM": 205, "300 MCM": 230, "350 MCM": 250, "400 MCM": 270,
+            "500 MCM": 310, "600 MCM": 340, "700 MCM": 375, "750 MCM": 385,
+            "800 MCM": 395, "900 MCM": 425, "1000 MCM": 445,
+        },
+    }
+
     def __init__(
         self,
         square_feet:      float,
@@ -165,10 +205,20 @@ class Dwelling:
     # -----------------------------------------------------------------------
 
     def _is_hvac(self, appliance: "Appliance") -> bool:
-        return any(k in appliance.name for k in self._HVAC_KEYWORDS)
+        name = appliance.name.lower()
+        return any(k in name for k in self._HVAC_KEYWORDS)
 
     def _is_motor(self, appliance: "Appliance") -> bool:
-        return any(k in appliance.name for k in self._MOTOR_KEYWORDS)
+        name = appliance.name.lower()
+        return any(k in name for k in self._MOTOR_KEYWORDS)
+
+    def _is_dryer(self, appliance: "Appliance") -> bool:
+        name = appliance.name.lower()
+        return any(k in name for k in self._DRYER_KEYWORDS)
+
+    def _is_range(self, appliance: "Appliance") -> bool:
+        name = appliance.name.lower()
+        return any(k in name for k in self._RANGE_KEYWORDS)
 
     def _phase_divisor(self) -> float:
         return self.voltage * (3 ** 0.5 if self.nphase == 3 else 1.0)
@@ -254,8 +304,7 @@ class Dwelling:
         """
         eligible = [
             a for a in appliances
-            if not any(n in a.name for n in self._SPECIAL_NAMES)
-            and not self._is_hvac(a)
+            if not self._is_dryer(a) and not self._is_range(a) and not self._is_hvac(a)
         ]
         total   = sum(a.power for a in eligible)
         df      = 0.75 if len(eligible) >= 4 else 1.0
@@ -277,8 +326,8 @@ class Dwelling:
         dryers, ranges, HVAC, and motors. Stores individual totals as
         instance attributes for later reuse in total_neutral_load_va().
         """
-        dryers = [a for a in self.appliances if "Clothes Dryer" in a.name]
-        ranges = [a for a in self.appliances if "Electric Range" in a.name]
+        dryers = [a for a in self.appliances if self._is_dryer(a)]
+        ranges = [a for a in self.appliances if self._is_range(a)]
         hvac   = [a for a in self.appliances if self._is_hvac(a)]
         motors = [a for a in self.appliances if self._is_motor(a)]
 
@@ -480,11 +529,11 @@ class Dwelling:
 
         # Reuse cached values from total_service_load_va() if already run
         if not hasattr(self, "total_dryer_load"):
-            dryers = [a for a in self.appliances if "Clothes Dryer" in a.name]
+            dryers = [a for a in self.appliances if self._is_dryer(a)]
             self.total_dryer_load = self.calculate_dryer_load(dryers) if dryers else 0.0
 
         if not hasattr(self, "total_range_load"):
-            ranges = [a for a in self.appliances if "Electric Range" in a.name]
+            ranges = [a for a in self.appliances if self._is_range(a)]
             self.total_range_load = self.calculate_range_load(ranges) if ranges else 0.0
 
         if not hasattr(self, "total_motor_load"):
@@ -557,6 +606,44 @@ class Dwelling:
 
         raise ValueError("Required amps exceed 400 A — parallel design required.")
 
+    def size_neutral_conductor(
+        self, required_amps: float, material: str = "copper", min_size: str = None
+    ) -> str:
+        """
+        Size the neutral (grounded) conductor from its own calculated demand
+        load using NEC Table 310.16 (75 °C) ampacities, per NEC 220.61 /
+        310.15(B)(7): unlike the ungrounded service conductors, the neutral
+        is not bound by the 100 A service-sizing-guide floor and may be
+        smaller when the demand load justifies it — but never smaller than
+        the grounding conductor required for this service (NEC 250.24(C)(1)).
+
+        Parameters
+        ----------
+        required_amps : Calculated neutral load in amps.
+        material      : 'copper' or 'aluminum'.
+        min_size      : Smallest permissible conductor size (typically the
+                         service's grounding conductor size); the result is
+                         bumped up to this size if the ampacity-based pick
+                         would otherwise be smaller.
+        """
+        material = material.lower()
+        if material not in ("copper", "aluminum"):
+            raise ValueError("Material must be 'copper' or 'aluminum'.")
+
+        table = self.AMPACITY_75C[material]
+        size = next(
+            (c for c in self.NEUTRAL_SIZING_ORDER if c in table and table[c] >= required_amps),
+            None,
+        )
+        if size is None:
+            raise ValueError("Required neutral amps exceed available conductor sizes.")
+
+        if min_size and min_size in self.NEUTRAL_SIZING_ORDER:
+            if self.NEUTRAL_SIZING_ORDER.index(size) < self.NEUTRAL_SIZING_ORDER.index(min_size):
+                size = min_size
+
+        return size
+
     def get_service_entrance_size(
         self, material: str = "copper", method: str = "Standard"
     ) -> tuple:
@@ -573,7 +660,10 @@ class Dwelling:
         Returns
         -------
         (service_size_dict, neutral_size_dict)
-            Each dict has keys 'service_rating' (A) and 'conductor_size'.
+            'service_size_dict' has keys 'service_rating' (A) and
+            'conductor_size'. 'neutral_size_dict' has 'service_rating' set
+            to None (the neutral is sized by ampacity, not a service rating)
+            and 'conductor_size'.
         """
         if method == "Standard":
             print("Standard method — calculating service load ...")
@@ -594,7 +684,23 @@ class Dwelling:
         print("Calculating neutral load ...")
         required_amps_neutral = self.neutral_amps()
         print(f"  Neutral load: {self.total_neutral_load:.0f} VA  ->  {required_amps_neutral:.1f} A")
-        neutral_size = self.size_service_conductor(required_amps_neutral, material)
+
+        min_neutral_size = None
+        try:
+            min_neutral_size = self.get_grounding_conductor_size(
+                service_size["conductor_size"], material
+            )
+        except ValueError:
+            pass    # Non-standard/parallel service size — skip the grounding-size floor.
+
+        neutral_conductor = self.size_neutral_conductor(
+            required_amps_neutral, material, min_size=min_neutral_size
+        )
+        print(
+            f"  Neutral conductor (sized independently, floor = grounding "
+            f"conductor {min_neutral_size}): {neutral_conductor}"
+        )
+        neutral_size = {"service_rating": None, "conductor_size": neutral_conductor}
 
         return service_size, neutral_size
 
