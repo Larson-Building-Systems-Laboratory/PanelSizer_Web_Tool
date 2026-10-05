@@ -4,7 +4,7 @@ import CalculationLog from './CalculationLog';
 
 interface CardProps {
   title: string;
-  rating?: number;
+  rating?: number | null;
   conductorSize: string;
   borderClass: string;
   bgClass: string;
@@ -14,7 +14,7 @@ function ResultCard({ title, rating, conductorSize, borderClass, bgClass }: Card
   return (
     <div className={`${bgClass} border border-border border-l-4 ${borderClass} rounded-lg p-4`}>
       <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted mb-3">{title}</h3>
-      {rating !== undefined && (
+      {rating != null && (
         <div className="flex justify-between items-baseline gap-2 text-sm py-1.5 border-b border-border">
           <span className="text-muted">Service Rating</span>
           <span className="font-bold text-text">{rating} A</span>

@@ -3,7 +3,7 @@ import type { Phase } from '@/api/panelSizer';
 
 interface Props {
   phase: Phase;
-  breakerAmps?: number;
+  breakerAmps?: number | null;
   conductorSize: string;
   neutralSize: string;
   groundSize: string;
@@ -83,7 +83,7 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
         strokeWidth={3}
       />
 
-      {breakerAmps !== undefined && (
+      {breakerAmps != null && (
         <DashedLabel cx={CENTER_X} cy={breakerLabelY} text={`${breakerAmps} A / ${poles}P`} />
       )}
 
