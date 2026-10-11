@@ -13,21 +13,21 @@ interface Props {
 }
 
 const inputCls =
-  'bg-white border border-border rounded text-text text-sm px-3 py-2 w-full outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors';
+  'bg-white border border-border rounded text-text text-sm max-sm:text-base px-3 py-2 w-full outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors';
 
 const labelCls = 'block text-xs font-semibold text-text mb-1';
 
 export default function DwellingForm({ values, onChange }: Props) {
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-bg-card-hover">
+      <div className="flex items-center gap-3 px-5 py-3 max-sm:px-4 border-b border-border bg-bg-card-hover">
         <span className="w-6 h-6 rounded-full bg-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
         <h2 className="text-sm font-semibold text-text">Dwelling Info</h2>
       </div>
 
-      <div className="p-5">
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div>
+      <div className="p-5 max-sm:p-4">
+        <div className="grid grid-cols-3 gap-3 mb-4 max-sm:grid-cols-2">
+          <div className="max-sm:col-span-2">
             <label className={labelCls}>
               Floor Area (sq ft) <span className="text-red font-normal">*</span>
             </label>
@@ -64,7 +64,7 @@ export default function DwellingForm({ values, onChange }: Props) {
 
         <div className="mb-4">
           <label className={labelCls}>Service Type</label>
-          <div className="flex gap-6 mt-1.5">
+          <div className="flex gap-6 mt-1.5 max-sm:flex-wrap max-sm:gap-y-2.5">
             {([
               { value: 1 as const, label: 'Single-Phase (120/240 V)' },
               { value: 3 as const, label: 'Three-Phase (120/208 V)' },
@@ -86,7 +86,7 @@ export default function DwellingForm({ values, onChange }: Props) {
 
         <div className="mb-4">
           <label className={labelCls}>Conductor Material</label>
-          <div className="flex gap-6 mt-1.5">
+          <div className="flex gap-6 mt-1.5 max-sm:flex-wrap max-sm:gap-y-2.5">
             {(['copper', 'aluminum'] as const).map(m => (
               <label key={m} className="flex items-center gap-2 text-sm text-text cursor-pointer select-none">
                 <input
@@ -105,7 +105,7 @@ export default function DwellingForm({ values, onChange }: Props) {
 
         <div>
           <label className={labelCls}>Calculation Method</label>
-          <div className="flex gap-6 mt-1.5">
+          <div className="flex gap-6 mt-1.5 max-sm:flex-wrap max-sm:gap-y-2.5">
             {(['Standard', 'Optional'] as const).map(m => (
               <label key={m} className="flex items-center gap-2 text-sm text-text cursor-pointer select-none">
                 <input

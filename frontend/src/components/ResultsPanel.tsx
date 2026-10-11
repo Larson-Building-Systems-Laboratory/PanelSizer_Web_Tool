@@ -33,7 +33,7 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
 
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden [animation:fadeIn_0.3s_ease]">
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-bg-card-hover">
+      <div className="flex items-center gap-3 px-5 py-3 max-sm:px-4 max-sm:flex-wrap max-sm:gap-y-2 border-b border-border bg-bg-card-hover">
         <h2 className="text-sm font-semibold text-text">Results Summary</h2>
         <span className="text-xs bg-blue-light text-blue px-2.5 py-0.5 rounded-full font-semibold">
           {method} Method
@@ -42,7 +42,7 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
           Calculated
         </span>
       </div>
-      <div className="p-5 grid grid-cols-3 gap-4">
+      <div className="p-5 grid grid-cols-3 gap-4 max-sm:p-4 max-sm:grid-cols-1 max-sm:gap-3">
         <ResultCard
           title="Service Entrance"
           rating={service.service_rating}
@@ -63,11 +63,11 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
           bgClass="bg-orange-light"
         />
       </div>
-      <div className="px-5 pb-5">
+      <div className="px-5 pb-5 max-sm:px-4 max-sm:pb-4">
         <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted mb-3">
           {phase === 3 ? 'Three-Phase (120/208 V)' : 'Single-Phase (120/240 V)'} Wiring Schematic
         </h3>
-        <div className="border border-border rounded-lg p-4 bg-white">
+        <div className="border border-border rounded-lg p-4 bg-white max-sm:p-2 max-sm:overflow-x-auto">
           <PanelDiagram
             phase={phase}
             breakerAmps={service.service_rating}
@@ -77,6 +77,7 @@ export default function ResultsPanel({ results }: { results: CalculateResult }) 
             material={material}
           />
         </div>
+        <p className="hidden max-sm:block text-[11px] text-muted mt-1.5">Swipe sideways to see the full schematic.</p>
       </div>
       <CalculationLog log={log} />
     </section>

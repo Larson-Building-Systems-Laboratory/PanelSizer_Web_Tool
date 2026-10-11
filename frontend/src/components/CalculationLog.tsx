@@ -58,7 +58,7 @@ export default function CalculationLog({ log }: Props) {
   const sections = groupLog(log);
 
   return (
-    <div className="px-5 pb-5">
+    <div className="px-5 pb-5 max-sm:px-4 max-sm:pb-4">
       <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted mb-3">
         Calculation Log
       </h3>

@@ -74,7 +74,7 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
   const groundLabel = `${groundSize} (${abbrev})`;
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${svgHeight}`} className="w-full h-auto" role="img" aria-label="Service panel wiring schematic">
+    <svg viewBox={`0 0 ${WIDTH} ${svgHeight}`} className="w-full h-auto max-sm:min-w-[560px]" role="img" aria-label="Service panel wiring schematic">
       <rect
         x={4} y={4}
         width={WIDTH - 8} height={svgHeight - 8}

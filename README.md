@@ -47,7 +47,7 @@ flowchart LR
     subgraph RG["Azure resource group: panelsizer-rg (East US)"]
         ACR[("Container Registry<br/>panelsizer-web, panelsizer-api")]
         subgraph ENV["Container Apps environment: panelsizer-env"]
-            WEB["panel-sizer<br/>Next.js standalone, port 3000<br/>0.25 vCPU, 0.5 GiB, 1 replica"]
+            WEB["panelsizer<br/>Next.js standalone, port 3000<br/>0.25 vCPU, 0.5 GiB, 1 replica"]
             API["panel-sizer-api<br/>Flask + gunicorn, port 8000<br/>0.25 vCPU, 0.5 GiB, 1 replica"]
         end
     end
@@ -58,14 +58,22 @@ flowchart LR
     ACR -. "images pulled at start" .-> API
 ```
 
-Live address: `https://panel-sizer.greenmeadow-18ece9da.eastus.azurecontainerapps.io`
+Live address: `https://panelsizer.azurewebsites.net`
+
+The frontend runs as the App Service web app `panelsizer` (resource group
+`panelsizer-rg`) on the BEST Center Tool plan `best-center-plan`, from the
+image `panelsizer-web:latest`, with `WEBSITES_PORT=3000`. It replaced the
+Container Apps frontend on 2026-10-08, so the frontend parts of the diagram
+above and of `AZURE_DEPLOY.md` are historical. The API is still the container
+app `panel-sizer-api`. After rebuilding the web image, restart the web app to
+pull it: `az webapp restart -n panelsizer -g panelsizer-rg`.
 
 ## How a calculation runs
 
 ```mermaid
 sequenceDiagram
     participant B as Browser
-    participant W as panel-sizer (Next.js)
+    participant W as panelsizer (Next.js)
     participant A as panel-sizer-api (Flask)
     participant D as Dwelling_v2 engine
 
@@ -122,7 +130,7 @@ Request body for `POST /api/calculate`:
 ```mermaid
 flowchart LR
     A1["az acr build<br/>panelsizer-api:latest"] --> A2["az containerapp update<br/>panel-sizer-api"]
-    W1["az acr build panelsizer-web:latest<br/>--build-arg BACKEND_URL=https://API"] --> W2["az containerapp update<br/>panel-sizer"]
+    W1["az acr build panelsizer-web:latest<br/>--build-arg BACKEND_URL=https://API"] --> W2["az containerapp update<br/>panelsizer"]
     A2 --> W1
 ```
 
@@ -174,7 +182,7 @@ cold start, so it is ruled out here. With one replica always on:
    was about 45 MB (frontend) and 66 MB (API), so there is ample headroom:
    ```bash
    az containerapp update -n panel-sizer-api -g $RG --cpu 0.25 --memory 0.5Gi --min-replicas 1 --max-replicas 1
-   az containerapp update -n panel-sizer     -g $RG --cpu 0.25 --memory 0.5Gi --min-replicas 1 --max-replicas 1
+   az containerapp update -n panelsizer     -g $RG --cpu 0.25 --memory 0.5Gi --min-replicas 1 --max-replicas 1
    ```
    An always-on replica that is not handling requests is billed at the lower
    idle rate, so a small idle replica is cheap. Raise `--max-replicas` again

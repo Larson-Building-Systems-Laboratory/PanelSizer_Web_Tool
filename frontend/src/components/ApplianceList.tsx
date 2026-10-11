@@ -18,7 +18,7 @@ const SUGGESTIONS = [
 ];
 
 const inputCls =
-  'bg-white border border-border rounded text-text text-sm px-2.5 py-2 w-full outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors';
+  'bg-white border border-border rounded text-text text-sm max-sm:text-base px-2.5 py-2 w-full outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors';
 
 interface RowProps {
   appliance: Appliance;
@@ -31,9 +31,9 @@ function ApplianceRow({ appliance, phase, onChange, onRemove }: RowProps) {
   const secondaryVoltage = phase === 3 ? 208 : 240;
 
   return (
-    <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 items-center py-2 border-b border-border last:border-b-0">
+    <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 items-center py-2 border-b border-border last:border-b-0 max-sm:grid-cols-[1fr_1fr_40px] max-sm:py-3 max-sm:first:pt-0 max-sm:last:pb-0">
       <input
-        className={inputCls}
+        className={`${inputCls} max-sm:col-span-3`}
         type="text"
         list="appliance-suggestions"
         placeholder="Appliance name"
@@ -69,7 +69,7 @@ function ApplianceRow({ appliance, phase, onChange, onRemove }: RowProps) {
         type="button"
         aria-label="Remove appliance"
         onClick={() => onRemove(appliance.id)}
-        className="w-[30px] h-[30px] flex items-center justify-center rounded border border-remove-border text-remove-fg text-sm cursor-pointer hover:bg-error-bg hover:text-red transition-colors"
+        className="w-[30px] h-[30px] max-sm:w-10 max-sm:h-10 flex items-center justify-center rounded border border-remove-border text-remove-fg text-sm cursor-pointer hover:bg-error-bg hover:text-red transition-colors"
       >
         ✕
       </button>
@@ -88,7 +88,7 @@ interface Props {
 export default function ApplianceList({ appliances, phase, onAdd, onChange, onRemove }: Props) {
   return (
     <section className="bg-bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-bg-card-hover">
+      <div className="flex items-center justify-between px-5 py-3 max-sm:px-4 border-b border-border bg-bg-card-hover">
         <div className="flex items-center gap-3">
           <span className="w-6 h-6 rounded-full bg-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
           <h2 className="text-sm font-semibold text-text">Appliances</h2>
@@ -96,13 +96,13 @@ export default function ApplianceList({ appliances, phase, onAdd, onChange, onRe
         <button
           type="button"
           onClick={onAdd}
-          className="bg-white border border-border text-muted text-xs px-3 py-1.5 rounded hover:border-blue hover:text-blue transition-colors cursor-pointer"
+          className="bg-white border border-border text-muted text-xs px-3 py-1.5 max-sm:text-sm max-sm:py-2 rounded hover:border-blue hover:text-blue transition-colors cursor-pointer"
         >
           + Add Appliance
         </button>
       </div>
 
-      <div className="p-5">
+      <div className="p-5 max-sm:p-4">
         {appliances.length === 0 && (
           <p className="text-xs text-muted text-center py-4">
             No appliances added yet. Click &quot;+ Add Appliance&quot; to begin.
@@ -111,7 +111,7 @@ export default function ApplianceList({ appliances, phase, onAdd, onChange, onRe
 
         {appliances.length > 0 && (
           <>
-            <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 pb-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted">
+            <div className="grid grid-cols-[1fr_96px_80px_32px] gap-2 pb-2 mb-1 max-sm:hidden border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted">
               <span>Name</span><span>Power</span><span>Voltage</span><span />
             </div>
             {appliances.map(a => (
