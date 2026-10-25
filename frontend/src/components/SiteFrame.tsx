@@ -1,50 +1,64 @@
 import Link from 'next/link';
 import { SITE, SITE_LINKS } from '@/lib/site';
+import { BestLogo } from './BestLogo';
 
-export const PRIMARY_LINK =
-  'bg-blue text-white font-semibold rounded-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
-
-// Header and footer shared by the landing page and the legal pages
-export function SiteFrame({ children }: { children: React.ReactNode }) {
+// Global nav: frosted, sticky, with the BEST green rule along the bottom
+export function SiteNav({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-gradient-to-r from-header-from to-header-to px-8 py-4 max-sm:px-4 max-sm:py-3">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <Link href="/" className="flex items-center gap-4 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-            <span className="w-9 h-9 rounded bg-blue flex items-center justify-center flex-shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-            </span>
-            <span>
-              <span className="block text-white text-lg font-bold tracking-tight leading-tight">{SITE.name}</span>
-              <span className="block text-header-sub text-[11px] leading-tight">{SITE.tagline}</span>
-            </span>
+    <header className="frosted sticky top-0 z-40 border-b-2 border-brand">
+      <div className="max-w-7xl mx-auto h-[52px] flex items-center justify-between gap-4 px-6 max-sm:px-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <BestLogo height={30} />
+          <span aria-hidden className="h-6 w-px shrink-0 bg-hairline max-sm:hidden" />
+          <Link href="/" className="flex items-baseline gap-2 min-w-0 max-sm:hidden">
+            <span className="text-[17px] font-semibold tracking-[-0.01em] text-ink">{SITE.name}</span>
+            <span className="text-[13px] text-muted truncate max-lg:hidden">{SITE.tagline}</span>
           </Link>
-
-          <nav aria-label="Site" className="flex items-center gap-5 text-sm max-sm:gap-4">
+        </div>
+        {children ?? (
+          <nav aria-label="Site" className="flex items-center gap-6 max-sm:gap-3">
             {SITE_LINKS.map(link => (
-              <Link key={link.href} href={link.href} className="text-white/80 hover:text-white rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              <Link key={link.href} href={link.href} className="text-[13px] text-muted hover:text-body transition-colors max-sm:hidden">
                 {link.label}
               </Link>
             ))}
-            <Link href="/tool" className={`${PRIMARY_LINK} px-4 py-2`}>Get started</Link>
+            <Link href="/tool" className="btn btn-primary btn-sm">Open the tool</Link>
           </nav>
-        </div>
-      </header>
+        )}
+      </div>
+    </header>
+  );
+}
 
-      <main className="max-w-7xl mx-auto w-full flex-1 px-8 py-10 max-sm:px-4 max-sm:py-6">{children}</main>
-
-      <footer className="bg-white border-t border-border">
-        <div className="max-w-7xl mx-auto px-8 py-4 max-sm:px-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
-          <p>© {SITE.year} {SITE.owner}</p>
-          <nav aria-label="Legal" className="flex gap-4">
-            {SITE_LINKS.map(link => (
-              <Link key={link.href} href={link.href} className="hover:text-text">{link.label}</Link>
-            ))}
-          </nav>
+function SiteFooter() {
+  return (
+    <footer className="bg-mint text-ink border-t-4 border-brand">
+      <div className="max-w-7xl mx-auto px-6 py-10 max-sm:px-4 flex flex-wrap items-center justify-between gap-6 text-[12px]">
+        <div className="flex flex-wrap items-center gap-4">
+          <BestLogo height={40} />
+          <span aria-hidden className="h-8 w-px bg-ink max-sm:hidden" />
+          <div>
+            <p className="text-[14px] font-semibold">{SITE.name}</p>
+            <p className="mt-1">© <span className="nums">{SITE.year}</span> {SITE.owner}</p>
+          </div>
         </div>
-      </footer>
+        <nav aria-label="Legal" className="flex gap-6">
+          {SITE_LINKS.map(link => (
+            <Link key={link.href} href={link.href} className="underline-offset-2 hover:underline">{link.label}</Link>
+          ))}
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
+// Shared frame for the landing page and the legal pages
+export function SiteFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col min-h-screen bg-canvas">
+      <SiteNav />
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
     </div>
   );
 }
@@ -53,10 +67,15 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
 export function SiteDocument({ title, summary, children }: { title: string; summary: string; children: React.ReactNode }) {
   return (
     <SiteFrame>
-      <article className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold tracking-tight max-sm:text-2xl">{title}</h1>
-        <p className="mt-2 text-muted">{summary}</p>
-        <div className="mt-6 flex flex-col gap-4">{children}</div>
+      <article className="bg-mist">
+        <div className="max-w-[760px] mx-auto px-6 pt-16 pb-20 max-sm:px-4 max-sm:pt-10">
+          <div className="animate-enter">
+            <p className="text-[14px] font-semibold text-primary">{SITE.name}</p>
+            <h1 className="mt-2 text-[40px] leading-[1.1] tracking-[-0.5px] max-sm:text-[30px]">{title}</h1>
+            <p className="mt-4 text-[21px] font-light leading-[1.5] text-muted max-sm:text-[17px]">{summary}</p>
+          </div>
+          <div className="stagger mt-12 flex flex-col gap-4">{children}</div>
+        </div>
       </article>
     </SiteFrame>
   );
@@ -64,9 +83,9 @@ export function SiteDocument({ title, summary, children }: { title: string; summ
 
 export function DocumentSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="bg-bg-card border border-border rounded-lg shadow-sm px-6 py-5 max-sm:px-4">
-      <h2 className="text-base font-semibold">{title}</h2>
-      <div className="mt-2 space-y-3 text-sm text-log-normal [&_a]:text-green [&_a]:underline [&_a]:underline-offset-2 [&_li]:ml-5 [&_li]:list-disc [&_strong]:text-text [&_ul]:space-y-1.5">
+    <section className="card p-6 max-sm:p-5">
+      <h2 className="text-[21px] tracking-[-0.2px]">{title}</h2>
+      <div className="mt-3 space-y-3 text-[17px] leading-[1.47] text-muted [&_a]:text-primary [&_a]:underline-offset-2 hover:[&_a]:underline [&_li]:ml-5 [&_li]:list-disc [&_strong]:font-semibold [&_strong]:text-body [&_ul]:space-y-1.5">
         {children}
       </div>
     </section>

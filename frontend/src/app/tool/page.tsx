@@ -6,6 +6,7 @@ import DwellingForm, { type DwellingValues } from '@/components/DwellingForm';
 import ApplianceList, { newAppliance, type Appliance } from '@/components/ApplianceList';
 import ResultsPanel from '@/components/ResultsPanel';
 import { calculatePanel, type CalculateResult } from '@/api/panelSizer';
+import { SiteNav } from '@/components/SiteFrame';
 
 const DEFAULTS: DwellingValues = {
   squareFeet: '',
@@ -91,66 +92,47 @@ export default function Page() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen bg-mist">
+      <SiteNav>
+        <Link
+          href="/"
+          className="text-[13px] text-muted hover:text-body transition-colors"
+        >
+          Home
+        </Link>
+      </SiteNav>
 
-      {/* Top header bar */}
-      <header className="bg-gradient-to-r from-header-from to-header-to px-8 py-4 max-sm:px-4 max-sm:py-3">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <div className="w-9 h-9 rounded bg-blue flex items-center justify-center flex-shrink-0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-white text-lg font-bold tracking-tight leading-tight">Panel Sizer</h1>
-            <p className="text-header-sub text-[11px] leading-tight">NEC Residential Service Entrance Calculator</p>
-          </div>
-          <Link
-            href="/"
-            className="ml-auto flex items-center gap-1.5 text-sm text-white/80 hover:text-white border border-white/25 hover:border-white/60 rounded-lg px-3 py-1.5 transition-colors"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M3 11l9-8 9 8M5 10v10h14V10"/>
-            </svg>
-            Home
-          </Link>
-        </div>
-      </header>
-
-      {/* Step navigation */}
-      <nav className="bg-white border-b border-border">
-        <div className="max-w-7xl mx-auto px-8 flex max-sm:px-2 max-sm:justify-between">
+      {/* Step progress */}
+      <nav aria-label="Progress" className="bg-canvas border-b border-hairline">
+        <ol className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-2 overflow-x-auto max-sm:px-4">
           {STEPS.map((step, idx) => {
             const isDone = step.id < activeStep;
             const isActive = step.id === activeStep;
             return (
-              <div key={step.id} className="flex items-center">
-                <div className={`flex items-center gap-2 px-4 py-3.5 text-sm border-b-2 transition-colors max-sm:px-2 max-sm:py-3 max-sm:whitespace-nowrap ${
-                  isActive
-                    ? 'border-b-blue text-blue font-semibold'
-                    : isDone
-                    ? 'border-b-green text-green font-medium'
-                    : 'border-b-[transparent] text-muted'
-                }`}>
-                  <span className={`w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center flex-shrink-0 ${
-                    isActive ? 'bg-blue text-white' : isDone ? 'bg-green text-white' : 'bg-border text-muted'
-                  }`}>{step.id}</span>
+              <li key={step.id} className="flex items-center gap-2 shrink-0">
+                <span
+                  aria-current={isActive ? 'step' : undefined}
+                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[14px] transition-colors duration-300 ${
+                    isActive ? 'bg-mint text-ink font-semibold' : isDone ? 'text-primary' : 'text-muted'
+                  }`}
+                >
+                  <span className={`nums w-5 h-5 rounded-full text-[11px] font-semibold flex items-center justify-center transition-colors duration-300 ${
+                    isActive || isDone ? 'bg-primary text-white' : 'bg-mist text-muted'
+                  }`}>
+                    {isDone ? '✓' : step.id}
+                  </span>
                   <span className={isActive ? undefined : 'max-sm:hidden'}>{step.label}</span>
-                </div>
-                {idx < STEPS.length - 1 && (
-                  <svg className="text-border flex-shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 18l6-6-6-6"/>
-                  </svg>
-                )}
-              </div>
+                </span>
+                {idx < STEPS.length - 1 && <span aria-hidden className="w-6 h-px bg-hairline max-sm:w-3" />}
+              </li>
             );
           })}
-        </div>
+        </ol>
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto w-full px-8 py-6 grid grid-cols-[480px_1fr] gap-6 items-start max-[900px]:grid-cols-1 max-sm:px-4 max-sm:py-4 max-sm:gap-4">
-        <form className="flex flex-col gap-4" onSubmit={calculate}>
+      <main className="max-w-7xl mx-auto w-full px-6 py-8 grid grid-cols-[480px_1fr] gap-4 items-start max-[900px]:grid-cols-1 max-sm:px-4 max-sm:py-5">
+        <form className="stagger flex flex-col gap-4" onSubmit={calculate}>
           <DwellingForm values={dwelling} onChange={updateDwelling} />
           <ApplianceList
             appliances={appliances}
@@ -160,37 +142,34 @@ export default function Page() {
             onRemove={removeAppliance}
           />
           {error && (
-            <div className="bg-error-bg border border-error-border rounded-lg text-error-text text-sm px-4 py-3">
+            <div role="alert" className="animate-settle rounded-chip bg-mist text-error text-[14px] px-4 py-3">
               {error}
             </div>
           )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue text-white font-semibold text-sm rounded-lg py-3 px-6 max-sm:py-3.5 max-sm:text-base w-full cursor-pointer hover:opacity-90 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
+          <button type="submit" disabled={loading} className="btn btn-primary w-full py-3.5">
             {loading ? 'Calculating…' : 'Calculate Panel Size'}
           </button>
         </form>
 
-        <div ref={resultsRef} className="flex flex-col gap-4 min-w-0 scroll-mt-4">
+        <div ref={resultsRef} className="flex flex-col gap-4 min-w-0 scroll-mt-20 min-[901px]:sticky min-[901px]:top-[76px]">
           {!results && !loading && (
-            <div className="bg-bg-card border border-border rounded-lg py-16 px-8 max-sm:py-10 max-sm:px-5 text-center shadow-sm">
-              <div className="w-14 h-14 rounded-full bg-blue-light flex items-center justify-center mx-auto mb-4">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue">
+            <div className="card animate-fade py-16 px-8 max-sm:py-10 max-sm:px-5 text-center">
+              <div className="w-14 h-14 rounded-full bg-mint flex items-center justify-center mx-auto mb-5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" aria-hidden>
                   <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/>
                 </svg>
               </div>
-              <p className="text-sm text-muted max-w-xs mx-auto">
+              <p className="text-[21px] font-semibold tracking-[-0.2px] text-ink">Ready when you are.</p>
+              <p className="mt-2 text-[15px] text-muted max-w-xs mx-auto">
                 Fill in the dwelling details and appliances, then click{' '}
-                <strong className="text-text">Calculate Panel Size</strong> to see results.
+                <strong className="text-body">Calculate Panel Size</strong> to see results.
               </p>
             </div>
           )}
           {loading && (
-            <div className="bg-bg-card border border-border rounded-lg py-16 px-8 max-sm:py-10 max-sm:px-5 text-center shadow-sm">
-              <div className="w-9 h-9 rounded-full border-[3px] border-border border-t-blue mx-auto mb-4 animate-spin" />
-              <p className="text-sm text-muted">Running NEC calculations…</p>
+            <div className="card animate-fade py-16 px-8 max-sm:py-10 max-sm:px-5 text-center">
+              <div className="w-9 h-9 rounded-full border-[3px] border-hairline border-t-brand mx-auto mb-4 animate-spin" />
+              <p className="text-[15px] text-muted">Running NEC calculations…</p>
             </div>
           )}
           {results && <ResultsPanel results={results} />}

@@ -1,4 +1,3 @@
-import colors from '@/lib/colors';
 import type { Phase } from '@/api/panelSizer';
 
 interface Props {
@@ -9,6 +8,12 @@ interface Props {
   groundSize: string;
   material: 'copper' | 'aluminum';
 }
+
+// BEST Center palette (see DESIGN.md)
+const INK = '#161616';
+const ACTION = '#126000';
+const BRAND = '#00964f';
+const HAIRLINE = '#c8c8c8';
 
 const WIDTH = 900;
 const LINE_START_X = 90;
@@ -34,9 +39,9 @@ function DashedLabel({ cx, cy, text }: { cx: number; cy: number; text: string })
         y={cy - LABEL_BOX_H / 2}
         width={LABEL_BOX_W}
         height={LABEL_BOX_H}
-        rx={4}
+        rx={11}
         fill="white"
-        stroke={colors.headerFrom}
+        stroke={BRAND}
         strokeWidth={1.5}
         strokeDasharray="5,4"
       />
@@ -45,9 +50,9 @@ function DashedLabel({ cx, cy, text }: { cx: number; cy: number; text: string })
         y={cy}
         textAnchor="middle"
         dominantBaseline="central"
-        fill={colors.red}
+        fill={ACTION}
         fontSize={20}
-        fontWeight={700}
+        fontWeight={600}
       >
         {text}
       </text>
@@ -74,53 +79,54 @@ export default function PanelDiagram({ phase, breakerAmps, conductorSize, neutra
   const groundLabel = `${groundSize} (${abbrev})`;
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${svgHeight}`} className="w-full h-auto max-sm:min-w-[560px]" role="img" aria-label="Service panel wiring schematic">
+    <svg viewBox={`0 0 ${WIDTH} ${svgHeight}`} className="w-full h-auto max-sm:min-w-[560px] font-sans" role="img" aria-label="Service panel wiring schematic">
       <rect
         x={4} y={4}
         width={WIDTH - 8} height={svgHeight - 8}
+        rx={14}
         fill="none"
-        stroke={colors.text}
-        strokeWidth={3}
+        stroke={HAIRLINE}
+        strokeWidth={2}
       />
 
       {breakerAmps != null && (
         <DashedLabel cx={CENTER_X} cy={breakerLabelY} text={`${breakerAmps} A / ${poles}P`} />
       )}
 
-      <line x1={CENTER_X} y1={breakerPeakY} x2={CENTER_X} y2={phaseYs[phaseYs.length - 1] - HUMP_HEIGHT} stroke={colors.text} strokeWidth={2.5} />
+      <line x1={CENTER_X} y1={breakerPeakY} x2={CENTER_X} y2={phaseYs[phaseYs.length - 1] - HUMP_HEIGHT} stroke={INK} strokeWidth={2.5} />
 
       {phaseLetters.map((letter, i) => {
         const y = phaseYs[i];
         return (
           <g key={letter}>
-            <text x={LINE_START_X - 35} y={y} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">
+            <text x={LINE_START_X - 35} y={y} fontSize={26} fontWeight={600} fill={INK} dominantBaseline="central">
               {letter}
             </text>
-            <line x1={LINE_START_X} y1={y} x2={BREAKER_X1} y2={y} stroke={colors.text} strokeWidth={3} />
+            <line x1={LINE_START_X} y1={y} x2={BREAKER_X1} y2={y} stroke={INK} strokeWidth={3} />
             <path
               d={`M ${BREAKER_X1},${y} Q ${BREAKER_X1 + 30},${y - HUMP_HEIGHT} ${CENTER_X},${y - HUMP_HEIGHT} Q ${BREAKER_X2 - 30},${y - HUMP_HEIGHT} ${BREAKER_X2},${y}`}
               fill="none"
-              stroke={colors.text}
+              stroke={INK}
               strokeWidth={3}
             />
-            <line x1={BREAKER_X2} y1={y} x2={LINE_END_X} y2={y} stroke={colors.text} strokeWidth={3} />
+            <line x1={BREAKER_X2} y1={y} x2={LINE_END_X} y2={y} stroke={INK} strokeWidth={3} />
             <DashedLabel cx={LABEL_BOX_CX} cy={y - LABEL_LINE_GAP} text={conductorLabel} />
           </g>
         );
       })}
 
       <g>
-        <text x={LINE_START_X - 35} y={neutralY} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">N</text>
-        <line x1={LINE_START_X} y1={neutralY} x2={LINE_END_X} y2={neutralY} stroke={colors.text} strokeWidth={3} />
+        <text x={LINE_START_X - 35} y={neutralY} fontSize={26} fontWeight={600} fill={INK} dominantBaseline="central">N</text>
+        <line x1={LINE_START_X} y1={neutralY} x2={LINE_END_X} y2={neutralY} stroke={INK} strokeWidth={3} />
         <DashedLabel cx={LABEL_BOX_CX} cy={neutralY - LABEL_LINE_GAP} text={neutralLabel} />
       </g>
 
       <g>
-        <line x1={GROUND_STUB_X} y1={neutralY} x2={GROUND_STUB_X} y2={groundStubBottomY} stroke={colors.text} strokeWidth={3} />
-        <line x1={GROUND_STUB_X - 16} y1={groundStubBottomY} x2={GROUND_STUB_X + 16} y2={groundStubBottomY} stroke={colors.text} strokeWidth={3} />
-        <line x1={GROUND_STUB_X - 10} y1={groundStubBottomY + 7} x2={GROUND_STUB_X + 10} y2={groundStubBottomY + 7} stroke={colors.text} strokeWidth={3} />
-        <line x1={GROUND_STUB_X - 4} y1={groundStubBottomY + 14} x2={GROUND_STUB_X + 4} y2={groundStubBottomY + 14} stroke={colors.text} strokeWidth={3} />
-        <text x={GROUND_STUB_X - 32} y={groundLabelY} fontSize={26} fontWeight={700} fill={colors.text} dominantBaseline="central">G</text>
+        <line x1={GROUND_STUB_X} y1={neutralY} x2={GROUND_STUB_X} y2={groundStubBottomY} stroke={INK} strokeWidth={3} />
+        <line x1={GROUND_STUB_X - 16} y1={groundStubBottomY} x2={GROUND_STUB_X + 16} y2={groundStubBottomY} stroke={INK} strokeWidth={3} />
+        <line x1={GROUND_STUB_X - 10} y1={groundStubBottomY + 7} x2={GROUND_STUB_X + 10} y2={groundStubBottomY + 7} stroke={INK} strokeWidth={3} />
+        <line x1={GROUND_STUB_X - 4} y1={groundStubBottomY + 14} x2={GROUND_STUB_X + 4} y2={groundStubBottomY + 14} stroke={INK} strokeWidth={3} />
+        <text x={GROUND_STUB_X - 32} y={groundLabelY} fontSize={26} fontWeight={600} fill={INK} dominantBaseline="central">G</text>
         <DashedLabel cx={GROUND_STUB_X + 25 + LABEL_BOX_W / 2} cy={groundLabelY} text={groundLabel} />
       </g>
     </svg>
