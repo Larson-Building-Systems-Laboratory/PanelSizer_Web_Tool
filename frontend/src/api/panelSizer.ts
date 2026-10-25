@@ -40,7 +40,7 @@ export async function calculatePanel(data: CalculatePayload): Promise<CalculateR
     body: JSON.stringify(data),
   });
 
-  let json: any;
+  let json: { success?: boolean; error?: string };
   try {
     json = await res.json();
   } catch {

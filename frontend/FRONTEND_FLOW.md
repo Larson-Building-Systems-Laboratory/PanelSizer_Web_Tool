@@ -30,7 +30,7 @@ interface DwellingValues {
 - Renders a list of `ApplianceRow` components.
 - Each row has: name (with datalist suggestions), power (watts), voltage (120/240 V), remove button.
 - Each `ApplianceRow` calls `onChange(id, field, value)` — the UUID `id` lets `page.tsx` find the right appliance.
-- `newAppliance()` helper creates a blank appliance with a `uuidv4()` id.
+- `newAppliance()` helper creates a blank appliance with a session-unique id.
 
 ```ts
 interface Appliance {

@@ -44,10 +44,10 @@ calculation log.
 flowchart LR
     U["User's browser"]
 
-    subgraph RG["Azure resource group: panelsizer-rg (East US)"]
-        ACR[("Container Registry<br/>panelsizer-web, panelsizer-api")]
-        subgraph ENV["Container Apps environment: panelsizer-env"]
-            WEB["panelsizer<br/>Next.js standalone, port 3000<br/>0.25 vCPU, 0.5 GiB, 1 replica"]
+    subgraph RG["Azure resource group: panelsizer-rg"]
+        ACR[("Container Registry panelsizeracr20260 (East US)<br/>panelsizer-web, panelsizer-api")]
+        WEB["panelsizer (App Service, Central US)<br/>Next.js standalone, port 3000<br/>on plan best-center-plan (B1)"]
+        subgraph ENV["Container Apps environment: panelsizer-env (East US)"]
             API["panel-sizer-api<br/>Flask + gunicorn, port 8000<br/>0.25 vCPU, 0.5 GiB, 1 replica"]
         end
     end
@@ -63,10 +63,10 @@ Live address: `https://panelsizer.azurewebsites.net`
 The frontend runs as the App Service web app `panelsizer` (resource group
 `panelsizer-rg`) on the BEST Center Tool plan `best-center-plan`, from the
 image `panelsizer-web:latest`, with `WEBSITES_PORT=3000`. It replaced the
-Container Apps frontend on 2026-10-08, so the frontend parts of the diagram
-above and of `AZURE_DEPLOY.md` are historical. The API is still the container
-app `panel-sizer-api`. After rebuilding the web image, restart the web app to
-pull it: `az webapp restart -n panelsizer -g panelsizer-rg`.
+Container Apps frontend on 2026-10-08. The plan lives in the resource group
+`best-center-tool-rg`. The API is still the container app `panel-sizer-api`.
+After rebuilding the web image, restart the web app to pull it:
+`az webapp restart -n panelsizer -g panelsizer-rg`.
 
 ## How a calculation runs
 
@@ -130,12 +130,12 @@ Request body for `POST /api/calculate`:
 ```mermaid
 flowchart LR
     A1["az acr build<br/>panelsizer-api:latest"] --> A2["az containerapp update<br/>panel-sizer-api"]
-    W1["az acr build panelsizer-web:latest<br/>--build-arg BACKEND_URL=https://API"] --> W2["az containerapp update<br/>panelsizer"]
+    W1["az acr build panelsizer-web:latest<br/>--build-arg BACKEND_URL=https://API"] --> W2["az webapp restart<br/>panelsizer"]
     A2 --> W1
 ```
 
 Exact commands, including how to recover the shell variables in a new
-terminal: [AZURE_DEPLOY.md](AZURE_DEPLOY.md) section 8.
+terminal: [AZURE_DEPLOY.md](AZURE_DEPLOY.md) sections 1 to 3.
 
 ## Run locally
 
@@ -167,7 +167,8 @@ npm run dev
 
 | Piece | Runs on | Approx. cost |
 |---|---|---|
-| Two containers, one replica each, always on | Container Apps, consumption plan | Billed per second of CPU and memory; partly covered by the monthly free grant |
+| Website | App Service web app on `best-center-plan` (B1), shared with the BEST Center Tool | No extra charge beyond that plan (~$13/month, counted under `best-center-tool-rg`) |
+| API, one replica, always on | Container Apps, consumption plan | Billed per second of CPU and memory; partly covered by the monthly free grant |
 | Image storage | Container Registry, Basic | ~$5/month |
 
 Figures are estimates from the setup notes, not invoices. Check the real
@@ -176,13 +177,12 @@ number under Cost Management for `panelsizer-rg`.
 Scale-to-zero is the usual Container Apps saving, but it causes a 10–30 second
 cold start, so it is ruled out here. With one replica always on:
 
-1. Give each container the smallest size. **Applied on 2026-10-05**: both
-   apps went from 0.5 vCPU / 1 GiB (max 2 replicas) to 0.25 vCPU / 0.5 GiB
+1. Give the API container the smallest size. **Applied on 2026-10-05**: it
+   went from 0.5 vCPU / 1 GiB (max 2 replicas) to 0.25 vCPU / 0.5 GiB
    (exactly 1 replica), which halves the always-on charge. Measured memory use
-   was about 45 MB (frontend) and 66 MB (API), so there is ample headroom:
+   was about 66 MB, so there is ample headroom:
    ```bash
    az containerapp update -n panel-sizer-api -g $RG --cpu 0.25 --memory 0.5Gi --min-replicas 1 --max-replicas 1
-   az containerapp update -n panelsizer     -g $RG --cpu 0.25 --memory 0.5Gi --min-replicas 1 --max-replicas 1
    ```
    An always-on replica that is not handling requests is billed at the lower
    idle rate, so a small idle replica is cheap. Raise `--max-replicas` again
@@ -200,7 +200,5 @@ Set a budget alert under Cost Management → Budgets.
 
 - `api/app.py` uses `CORS(app)`, which accepts every origin. Since the browser
   never calls the API directly, restrict it to the frontend address.
-- On Container Apps, the API can use internal ingress
-  (`az containerapp ingress update -n panel-sizer-api -g $RG --type internal`)
-  so only the frontend can reach it. Rebuild the frontend with the new
-  internal `BACKEND_URL` afterwards.
+- The API needs external ingress, because the website now runs on App Service
+  outside the Container Apps environment. Internal ingress would cut it off.

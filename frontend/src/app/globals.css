@@ -1,54 +1,304 @@
 @import "tailwindcss";
 
+/* BEST Center design system: see DESIGN.md. Colours and type match best-iucrc.org. */
 @theme {
-  /* Page & surface */
-  --color-bg:              #f0f4f8;
-  --color-bg-card:         #ffffff;
-  --color-bg-card-hover:   #f8fafc;
-  --color-border:          #d1d9e0;
-  --color-text:            #1a202c;
-  --color-muted:           #718096;
+  /* Every colour below comes from best-iucrc.org. */
 
-  /* Accent colors */
-  --color-blue:            #25D366;
-  --color-blue-light:      #e8f9ee;
-  --color-green:           #16a34a;
-  --color-green-light:     #dcfce7;
-  --color-orange:          #c2410c;
-  --color-orange-light:    #ffedd5;
-  --color-yellow:          #b45309;
-  --color-red:             #b91c1c;
+  /* Action */
+  --color-primary: #126000;
+  --color-brand: #00964f;
 
-  /* Error state */
-  --color-error-bg:        #fef2f2;
-  --color-error-border:    #fca5a5;
-  --color-error-text:      #b91c1c;
+  /* Text */
+  --color-ink: #0c3d00;
+  --color-body: #161616;
+  --color-muted: #767171;
+  --color-faint: #7a7a7a;
 
-  /* Appliance remove button */
-  --color-remove-border:   #fca5a5;
-  --color-remove-fg:       #ef4444;
+  /* Surfaces */
+  --color-canvas: #ffffff;
+  --color-mist: #fafafa;
+  --color-canopy: #061b00;
+  --color-mint: #b9deb8;
+  --color-selection: #154412;
 
-  /* Log viewer */
-  --color-log-header:      #25D366;
-  --color-log-normal:      #334155;
-  --color-log-index:       #cbd5e1;
-  --color-log-odd:         #f8fafc;
-  --color-log-row-border:  #e2e8f0;
+  /* Lines */
+  --color-hairline: #c8c8c8;
+  --color-hairline-strong: #919191;
 
-  /* Header bar */
-  --color-header-from:     #1e3a5f;
-  --color-header-to:       #14273f;
-  --color-header-sub:      #a3f4c1;
+  /* Attention (warnings and errors) */
+  --color-error: #96650c;
 
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-sans: var(--font-work-sans), system-ui, -apple-system, sans-serif;
+
+  --radius-field: 8px;
+  --radius-chip: 11px;
+  --radius-card: 18px;
+
+  --shadow-render: 3px 5px 30px 0 rgb(0 0 0 / 0.22);
+
+  --ease-standard: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--color-mist);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: -0.006em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: var(--color-ink);
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  input[type="number"],
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 11px 22px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      background-color 200ms var(--ease-standard),
+      color 200ms var(--ease-standard),
+      border-color 200ms var(--ease-standard),
+      transform 120ms var(--ease-standard);
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-ink);
+  }
+  .btn-secondary {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--color-mint);
+  }
+  .btn-on-dark {
+    background: #fff;
+    color: var(--color-ink);
+  }
+  .btn-on-dark:hover {
+    background: var(--color-mint);
+  }
+  .btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .card {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+
+  .chip {
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-chip);
+    background: var(--color-canvas);
+    transition:
+      background-color 200ms var(--ease-standard),
+      border-color 200ms var(--ease-standard),
+      transform 120ms var(--ease-standard);
+  }
+  .chip:hover {
+    border-color: var(--color-hairline-strong);
+  }
+  .chip:active {
+    transform: scale(0.95);
+  }
+  .chip[aria-pressed="true"],
+  .chip.is-selected {
+    border-color: var(--color-brand);
+    background: var(--color-mint);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+    color: var(--color-ink);
+  }
+
+  .field {
+    border: 1px solid var(--color-hairline-strong);
+    border-radius: var(--radius-field);
+    background: var(--color-canvas);
+    transition:
+      border-color 200ms var(--ease-standard),
+      box-shadow 200ms var(--ease-standard);
+  }
+  .field:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 1px var(--color-brand);
+    outline: none;
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-error);
+  }
+  .field[aria-invalid="true"]:focus {
+    box-shadow: 0 0 0 1px var(--color-error);
+  }
+
+  .frosted {
+    background: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* Canopy and charcoal surfaces: white text, headings follow. */
+  .on-dark {
+    color: #fff;
+  }
+  .on-dark :where(h1, h2, h3) {
+    color: inherit;
+  }
+
+  .link {
+    color: var(--color-primary);
+    text-underline-offset: 3px;
+  }
+  .link:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+.animate-enter {
+  animation: enter 600ms var(--ease-emphasized) both;
+}
+.animate-settle {
+  animation: settle 360ms var(--ease-emphasized) both;
+}
+.animate-fade {
+  animation: fade 400ms var(--ease-standard) both;
+}
+.animate-scale-in {
+  animation: scale-in 360ms var(--ease-emphasized) both;
+}
+
+/* Children enter one after another. */
+.stagger > * {
+  animation: enter 600ms var(--ease-emphasized) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.stagger > :nth-child(2) { --i: 1; }
+.stagger > :nth-child(3) { --i: 2; }
+.stagger > :nth-child(4) { --i: 3; }
+.stagger > :nth-child(5) { --i: 4; }
+.stagger > :nth-child(6) { --i: 5; }
+.stagger > :nth-child(7) { --i: 6; }
+.stagger > :nth-child(8) { --i: 7; }
+.stagger > :nth-child(9) { --i: 8; }
+.stagger > :nth-child(n + 10) { --i: 9; }
+
+/* Scroll reveal. Hidden only once RevealObserver has marked the page ready,
+   so content stays visible without JavaScript. */
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 800ms var(--ease-emphasized),
+    transform 800ms var(--ease-emphasized);
+  transition-delay: var(--d, 0ms);
+}
+.reveal-ready [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }
