@@ -2,9 +2,9 @@ import os
 import sys
 import io
 import contextlib
+import logging
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 BACKEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "backend")
 sys.path.insert(0, BACKEND_DIR)
@@ -12,7 +12,30 @@ sys.path.insert(0, BACKEND_DIR)
 from Dwelling_v2 import Dwelling, Appliance  # noqa: E402
 
 app = Flask(__name__)
-CORS(app)
+# Uploads/requests are tiny JSON bodies; refuse anything over 1 MB.
+app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024
+log = logging.getLogger("panelsizer")
+
+# No CORS: the browser only talks to the Next.js site, which proxies /api/* to this
+# server, so other websites have no reason to call it directly.
+
+
+@app.after_request
+def security_headers(response):
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    return response
+
+
+@app.errorhandler(Exception)
+def unhandled_error(e):
+    code = getattr(e, "code", 500)
+    if not isinstance(code, int) or code >= 500:
+        log.exception("Unhandled error on %s %s", request.method, request.path)
+        return jsonify({"success": False, "error": "Something went wrong on the server. Please try again."}), 500
+    return jsonify({"success": False, "error": getattr(e, "description", "Bad request.")}), code
 
 
 def validate(data):
@@ -31,7 +54,7 @@ def validate(data):
         errors.append("laundry_circuits must be a positive integer.")
 
     material = data.get("material", "copper")
-    if material.lower() not in ("copper", "aluminum"):
+    if not isinstance(material, str) or material.lower() not in ("copper", "aluminum"):
         errors.append("material must be 'copper' or 'aluminum'.")
 
     method = data.get("method", "Standard")
@@ -48,6 +71,9 @@ def validate(data):
         errors.append("appliances must be a list.")
     else:
         for i, a in enumerate(apps):
+            if not isinstance(a, dict) or not isinstance(a.get("name", ""), str):
+                errors.append(f"Appliance {i + 1}: must have a text name.")
+                continue
             if not a.get("name", "").strip():
                 errors.append(f"Appliance {i + 1}: name is required.")
             power = a.get("power_watts")
@@ -65,7 +91,7 @@ def validate(data):
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
     data = request.get_json(silent=True)
-    if data is None:
+    if not isinstance(data, dict):
         return jsonify({"success": False, "error": "Invalid JSON body."}), 400
 
     errors = validate(data)
@@ -102,8 +128,9 @@ def calculate():
             )
     except ValueError as e:
         return jsonify({"success": False, "error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"success": False, "error": f"Calculation error: {str(e)}"}), 500
+    except Exception:
+        log.exception("Panel sizing calculation failed")
+        return jsonify({"success": False, "error": "The calculation could not be completed. Please check your inputs and try again."}), 500
 
     log = [line for line in buf.getvalue().splitlines() if line.strip()]
 
