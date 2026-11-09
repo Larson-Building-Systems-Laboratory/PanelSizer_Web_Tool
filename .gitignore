@@ -19,3 +19,17 @@ docker-compose.yml
 
 # OS
 .DS_Store
+
+# Local tooling config
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.claude/
+.cursor/
+.cursorrules
+.gemini/
+.agent/
+.agents/
+.impeccable/
+.windsurf/
+.github/copilot-instructions.md

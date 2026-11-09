@@ -88,6 +88,34 @@ def validate(data):
     return errors
 
 
+@app.route("/api/health", methods=["GET"])
+def health():
+    """Sizes a reference dwelling end to end. Returns 503 if anything fails."""
+    checks = {}
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            dwelling = Dwelling(
+                square_feet=2000,
+                appliances=[
+                    Appliance("Range", 12000, 240),
+                    Appliance("Dryer", 5000, 240),
+                    Appliance("Water heater", 4500, 240),
+                ],
+                kitchen_circuits=2,
+                laundry_circuits=1,
+                voltage=240,
+                nphase=1,
+            )
+            service, _ = dwelling.get_service_entrance_size(material="copper", method="Standard")
+        checks["calculation"] = "ok" if service.get("conductor_size") else "fail"
+    except Exception:
+        log.exception("Health check: reference calculation failed")
+        checks["calculation"] = "fail"
+
+    healthy = all(v == "ok" for v in checks.values())
+    return jsonify({"status": "ok" if healthy else "degraded", "checks": checks}), 200 if healthy else 503
+
+
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
     data = request.get_json(silent=True)

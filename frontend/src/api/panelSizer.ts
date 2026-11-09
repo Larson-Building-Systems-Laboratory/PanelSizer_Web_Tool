@@ -33,6 +33,8 @@ export interface CalculateResult {
   grounding_conductor_size: string;
 }
 
+export const HEALTH_URL = '/api/health';
+
 export async function calculatePanel(data: CalculatePayload): Promise<CalculateResult> {
   const res = await fetch('/api/calculate', {
     method: 'POST',

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { HEALTH_URL } from '@/api/panelSizer';
 import { SITE, SITE_LINKS } from '@/lib/site';
 import { BestLogo } from './BestLogo';
+import { SystemStatus } from './SystemStatus';
 
 // Global nav: frosted, sticky, with the BEST green rule along the bottom
 export function SiteNav({ children }: { children?: React.ReactNode }) {
@@ -15,16 +17,19 @@ export function SiteNav({ children }: { children?: React.ReactNode }) {
             <span className="text-[13px] text-muted truncate max-lg:hidden">{SITE.tagline}</span>
           </Link>
         </div>
-        {children ?? (
-          <nav aria-label="Site" className="flex items-center gap-6 max-sm:gap-3">
-            {SITE_LINKS.map(link => (
-              <Link key={link.href} href={link.href} className="text-[13px] text-muted hover:text-body transition-colors max-sm:hidden">
-                {link.label}
-              </Link>
-            ))}
-            <Link href="/tool" className="btn btn-primary btn-sm">Open the tool</Link>
-          </nav>
-        )}
+        <div className="flex items-center gap-6 max-sm:gap-3">
+          <SystemStatus url={HEALTH_URL} className="text-muted" />
+          {children ?? (
+            <nav aria-label="Site" className="flex items-center gap-6 max-sm:gap-3">
+              {SITE_LINKS.map(link => (
+                <Link key={link.href} href={link.href} className="text-[13px] text-muted hover:text-body transition-colors max-sm:hidden">
+                  {link.label}
+                </Link>
+              ))}
+              <Link href="/tool" className="btn btn-primary btn-sm">Open the tool</Link>
+            </nav>
+          )}
+        </div>
       </div>
     </header>
   );

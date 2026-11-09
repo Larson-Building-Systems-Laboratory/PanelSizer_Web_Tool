@@ -2,3 +2,14 @@ node_modules
 .next
 out
 .env*
+**/CLAUDE.md
+**/AGENTS.md
+**/GEMINI.md
+**/.claude
+**/.cursor
+**/.cursorrules
+**/.gemini
+**/.agent
+**/.agents
+**/.impeccable
+**/.windsurf
