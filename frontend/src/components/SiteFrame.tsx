@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { HEALTH_URL } from '@/api/panelSizer';
 import { SITE, SITE_LINKS } from '@/lib/site';
 import { BestLogo } from './BestLogo';
 import { SystemStatus } from './SystemStatus';
+import { HEALTH_URL } from '@/api/panelSizer';
 
 // Global nav: frosted, sticky, with the BEST green rule along the bottom
 export function SiteNav({ children }: { children?: React.ReactNode }) {
@@ -17,19 +17,16 @@ export function SiteNav({ children }: { children?: React.ReactNode }) {
             <span className="text-[13px] text-muted truncate max-lg:hidden">{SITE.tagline}</span>
           </Link>
         </div>
-        <div className="flex items-center gap-6 max-sm:gap-3">
-          <SystemStatus url={HEALTH_URL} className="text-muted" />
-          {children ?? (
-            <nav aria-label="Site" className="flex items-center gap-6 max-sm:gap-3">
-              {SITE_LINKS.map(link => (
-                <Link key={link.href} href={link.href} className="text-[13px] text-muted hover:text-body transition-colors max-sm:hidden">
-                  {link.label}
-                </Link>
-              ))}
-              <Link href="/tool" className="btn btn-primary btn-sm">Open the tool</Link>
-            </nav>
-          )}
-        </div>
+        {children ?? (
+          <nav aria-label="Site" className="flex items-center gap-6 max-sm:gap-3">
+            {SITE_LINKS.map(link => (
+              <Link key={link.href} href={link.href} className="text-[13px] text-muted hover:text-body transition-colors max-sm:hidden">
+                {link.label}
+              </Link>
+            ))}
+            <Link href="/tool" className="btn btn-primary btn-sm">Open the tool</Link>
+          </nav>
+        )}
       </div>
     </header>
   );
@@ -39,13 +36,16 @@ function SiteFooter() {
   return (
     <footer className="bg-mint text-ink border-t-4 border-brand">
       <div className="max-w-7xl mx-auto px-6 py-10 max-sm:px-4 flex flex-wrap items-center justify-between gap-6 text-[12px]">
-        <div className="flex flex-wrap items-center gap-4">
-          <BestLogo height={40} />
-          <span aria-hidden className="h-8 w-px bg-ink max-sm:hidden" />
-          <div>
-            <p className="text-[14px] font-semibold">{SITE.name}</p>
-            <p className="mt-1">© <span className="nums">{SITE.year}</span> {SITE.owner}</p>
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-center gap-4">
+            <BestLogo height={40} />
+            <span aria-hidden className="h-8 w-px bg-ink max-sm:hidden" />
+            <div>
+              <p className="text-[14px] font-semibold">{SITE.name}</p>
+              <p className="mt-1">© <span className="nums">{SITE.year}</span> {SITE.owner}</p>
+            </div>
           </div>
+          <SystemStatus url={HEALTH_URL} />
         </div>
         <nav aria-label="Legal" className="flex gap-6">
           {SITE_LINKS.map(link => (
